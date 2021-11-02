@@ -161,7 +161,7 @@ class PyTitleBar(QWidget):
 
         # ADD Buttons
         if is_custom_title_bar:            
-            self.bg_layout.addWidget(self.minimize_button)
+            self.bg_layout.addWidget(self.add_todo_button)
             self.bg_layout.addWidget(self.close_button)
 
     # ADD BUTTONS TO TITLE BAR
@@ -260,11 +260,10 @@ class PyTitleBar(QWidget):
         self.custom_buttons_layout.setContentsMargins(0,0,0,0)
         self.custom_buttons_layout.setSpacing(3)
 
-        # MINIMIZE BUTTON
-        self.minimize_button = PyTitleButton(
+        self.add_todo_button = PyTitleButton(
             self._parent,
             self._app_parent,
-            tooltip_text = "Close app",
+            tooltip_text = "Add Todo",
             dark_one = self._dark_one,
             bg_color = self._btn_bg_color,
             bg_color_hover = self._btn_bg_color_hover,

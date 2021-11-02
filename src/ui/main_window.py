@@ -1,12 +1,12 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import QMainWindow, QFrame, QHBoxLayout, QVBoxLayout
-import sys
+from PySide6.QtCore import Qt
+# from PySide6.QtGui import *
+from PySide6.QtWidgets import QMainWindow, QFrame, QHBoxLayout, QVBoxLayout, QScrollArea, QWidget
 
 from src.widgets.py_button import PyButton
 from src.widgets.py_slider import PySlider
 from src.widgets.py_toggle import PyToggle
 from src.widgets.py_title_bar import PyTitleBar
+from src.widgets.py_todo import PyTodo, PyTodoEdit
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -14,6 +14,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.resize(300,200)
 
         self.main_container = QFrame(self)
         self.main_container.setObjectName(u"main_container")
@@ -25,9 +26,9 @@ class MainWindow(QMainWindow):
         }
         """)
         self.main_container.setLayout(QVBoxLayout())
+        self.main_container.layout().setAlignment(Qt.AlignTop)
 
         self.setCentralWidget(self.main_container)
-
 
         # Title Bar
         title_bar_container = QFrame()
@@ -38,36 +39,45 @@ class MainWindow(QMainWindow):
 
         title_bar = PyTitleBar(self, self)
         title_bar.set_title('QuteTodo - The Best Todo List')
+        title_bar.add_todo_button.clicked.connect(self.add_todo)
         title_bar_container.layout().addWidget(title_bar)
+
         self.main_container.layout().addWidget(title_bar_container)
 
-        # Widgets
-        self.btn_1 = PyButton("Test!")
-        self.btn_2 = PyButton("Woohoo!")
 
-        self.slider = PySlider()
-        self.slider.setMinimum(70)
-        self.slider.setMaximum(100)
-        self.slider.setTickInterval(1)
-        self.slider.setValue(80)
-        self.on_slider_changed()
+        # Todo Container
+        todo_scroll_container = QScrollArea()
+        todo_scroll_container.setWidgetResizable(True)
+        todo_scroll_container.setStyleSheet('background: transparent;')
+        todo_scroll_container.setFrameShape(QFrame.NoFrame)
+        todo_scroll_container.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        todo_scroll_container.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.main_container.layout().addWidget(todo_scroll_container)
 
-        self.workspace_container = QHBoxLayout()
-        self.workspace_container.addWidget(self.btn_1)
-        self.workspace_container.addWidget(self.btn_2)
-        self.workspace_container.addWidget(self.slider)
-        self.workspace_container.addWidget(PyToggle(width=40, height=20, circle_margin=3, active_color="#0379FF"))
-        self.main_container.layout().addLayout(self.workspace_container)
+        self.todo_container = QWidget()
+        self.todo_container.setLayout(QVBoxLayout())
+        todo_scroll_container.setWidget(self.todo_container)
 
-        # Signals
-        self.slider.valueChanged.connect(self.on_slider_changed)
-
-        self.resize(300,200)
+        # Todos
+        todo1 = PyTodo("Clean The Dog")
+        todo2 = PyTodo("Clean The Cat")
+        for td in [todo1, todo2]:
+            self.todo_container.layout().addWidget(td)
+        
         self.show()
 
-    def on_slider_changed(self):
-        val = self.slider.value()
-        self.setWindowOpacity(val/100)
+    def add_todo(self):
+        count = self.todo_container.layout().count()
+
+        def create_todo_from_todoedit(todoedit):
+            todoedit.setParent(None)
+            self.todo_container.layout().insertWidget(count, PyTodo(todoedit.text()))
+
+        new_todo_edit = PyTodoEdit(create_todo_from_todoedit)
+        self.todo_container.layout().addWidget(new_todo_edit)
+        new_todo_edit.setFocus()
+
+
 
     def mousePressEvent(self, event):
         # SET DRAG POS WINDOW

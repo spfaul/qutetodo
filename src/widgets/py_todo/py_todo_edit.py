@@ -17,6 +17,8 @@ class PyTodoEdit(QLineEdit):
             color: white;
         }
         """)
+        self.setMinimumHeight(25)
+        self.setMaxLength(30)
 
         self.editingFinished.connect(self.edit_finished)
 

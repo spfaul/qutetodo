@@ -5,17 +5,18 @@ from PySide6.QtWidgets import *
 class PyTodo(QRadioButton):
     _color = QColor('white')
 
-    def __init__(self, task):
+    def __init__(self, task, on_toggle_cb=None):
         super().__init__(task)
 
-        self.anim = QPropertyAnimation(self, b"color")
+        self.on_toggle_cb = on_toggle_cb
 
-        self.setMinimumHeight(20)
+        self.anim = QPropertyAnimation(self, b"color")
 
         self.opacityEff = QGraphicsOpacityEffect(self)
         self.opacityEff.setOpacity(1)
         self.setGraphicsEffect(self.opacityEff)
 
+        self.setMinimumHeight(20)
         self.setAutoExclusive(False)
         self.toggled.connect(self.on_toggle)
         self.update_stylesheet()
@@ -51,5 +52,7 @@ class PyTodo(QRadioButton):
             self.anim.start()
             self.opacityEff.setOpacity(1)
 
+        if self.on_toggle_cb:
+            self.on_toggle_cb(val)
 
 

@@ -18,7 +18,7 @@ class PyTodoEdit(QLineEdit):
         }
         """)
         self.setMinimumHeight(25)
-        self.setMaxLength(30)
+        self.setMaxLength(40)
 
         self.editingFinished.connect(self.edit_finished)
 

@@ -55,4 +55,6 @@ class PyTodo(QRadioButton):
         if self.on_toggle_cb:
             self.on_toggle_cb(val)
 
-
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
+            self.toggle()

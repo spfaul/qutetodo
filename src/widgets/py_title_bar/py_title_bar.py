@@ -161,6 +161,7 @@ class PyTitleBar(QWidget):
 
         # ADD Buttons
         if is_custom_title_bar:            
+            self.bg_layout.addWidget(self.toggle_edit_button)
             self.bg_layout.addWidget(self.add_todo_button)
             self.bg_layout.addWidget(self.close_button)
 
@@ -260,6 +261,24 @@ class PyTitleBar(QWidget):
         self.custom_buttons_layout.setContentsMargins(0,0,0,0)
         self.custom_buttons_layout.setSpacing(3)
 
+        self.toggle_edit_button = PyTitleButton(
+            self._parent,
+            self._app_parent,
+            tooltip_text = "Toggle Edit Mode",
+            dark_one = self._dark_one,
+            bg_color = self._btn_bg_color,
+            bg_color_hover = self._btn_bg_color_hover,
+            bg_color_pressed = self._btn_bg_color_pressed,
+            icon_color = self._icon_color,
+            icon_color_hover = self._icon_color_hover,
+            icon_color_pressed = self._icon_color_pressed,
+            icon_color_active = self._icon_color_active,
+            context_color = self._context_color,
+            text_foreground = self._text_foreground,
+            radius = 6,
+            icon_path = set_svg_icon("icon_more_options.svg")
+        )
+
         self.add_todo_button = PyTitleButton(
             self._parent,
             self._app_parent,
@@ -275,7 +294,7 @@ class PyTitleBar(QWidget):
             context_color = self._context_color,
             text_foreground = self._text_foreground,
             radius = 6,
-            icon_path = set_svg_icon("icon_minimize.svg")
+            icon_path = set_svg_icon("icon_add_user.svg")
         )
 
 

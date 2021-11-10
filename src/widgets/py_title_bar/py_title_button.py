@@ -52,6 +52,7 @@ class PyTitleButton(QPushButton):
         self.setFixedSize(width, height)
         self.setCursor(Qt.PointingHandCursor)
         self.setObjectName(btn_id)
+        self.setFocusPolicy(Qt.NoFocus)
 
         # PROPERTIES
         self._bg_color = bg_color

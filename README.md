@@ -1,5 +1,5 @@
 # QuteTodo
-A minimalist todo-list built using the Qt Framework.
+A minimalist To-Do list built using the Qt Framework.
 ![asdasd](https://user-images.githubusercontent.com/69741305/141303273-0986f8a0-c254-4a26-855b-de9e87b28867.png)
 
 

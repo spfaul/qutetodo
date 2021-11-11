@@ -48,4 +48,5 @@ This project is licensed under the MIT License. See LICENSE.txt for more.
 ## Credit
 This project was inspired by and makes use of several components in [Wanderson Magalhaes](https://github.com/Wanderson-Magalhaes "wanderson")'s [PyOneDark](https://github.com/Wanderson-Magalhaes/PyOneDark_Qt_Widgets_Modern_GUI)
 
-
+## FYI
+Support the project by giving the repo a ⭐!

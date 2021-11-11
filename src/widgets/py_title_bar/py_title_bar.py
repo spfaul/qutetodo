@@ -73,7 +73,7 @@ class PyTitleBar(QWidget):
         self,
         parent,
         app_parent,
-        logo_image = "logo_top_100x22.svg",
+        logo_image = "logo.svg",
         logo_width = 100,
         buttons = None,
         dark_one = "#1b1e23",
@@ -147,8 +147,8 @@ class PyTitleBar(QWidget):
 
         # ADD WIDGETS TO TITLE BAR
         # ///////////////////////////////////////////////////////////////
-        self.bg_layout.addWidget(self.top_logo)
-        self.bg_layout.addWidget(self.div_1)
+        # self.bg_layout.addWidget(self.top_logo)
+        # self.bg_layout.addWidget(self.div_1)
         self.bg_layout.addWidget(self.title_label)
         self.bg_layout.addWidget(self.div_2)
 
@@ -245,6 +245,7 @@ class PyTitleBar(QWidget):
         self.top_logo_layout.setContentsMargins(0,0,0,0)
         self.logo_svg = QSvgWidget()
         self.logo_svg.load(set_svg_image(self._logo_image))
+        self.logo_svg.setMinimumWidth(50)
         self.top_logo_layout.addWidget(self.logo_svg, Qt.AlignCenter, Qt.AlignCenter)
 
         # TITLE LABEL

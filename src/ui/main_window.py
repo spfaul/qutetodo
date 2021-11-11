@@ -10,6 +10,7 @@ from src.widgets.py_toggle import PyToggle
 from src.widgets.py_title_bar import PyTitleBar
 from src.widgets.py_todo import PyDeletableTodo, PyTodoEdit
 from src.widgets.py_bottom_bar import PyBottomBar
+from src.widgets.py_grips import PyGrips
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setWindowOpacity(.8)
-        self.resize(300,300)
+        self.resize(350,200)
 
         self.edit_mode = False
         self.todos_done = 0
@@ -106,26 +107,44 @@ class MainWindow(QMainWindow):
         self.bott_bar.setFocusPolicy(Qt.NoFocus)
         self.main_container.layout().addWidget(self.bott_bar)
 
-    def create_todo_from_todoedit(self, count, todoedit):
-        todoedit.setParent(None)
-        todo = PyDeletableTodo(
-            todoedit.text(), 
-            on_toggle_cb=self.on_todo_toggle,
-            on_delete_cb=self.delete_todo,
-            on_rename_cb=self.edit_todo
-        )
-        self.todo_container.layout().insertLayout(count, todo)
-        self.bott_bar.progress_bar.setMaximum(self.todo_container.layout().count())
+        self.left_grip = PyGrips(self, "left")
+        self.right_grip = PyGrips(self, "right")
+        self.top_grip = PyGrips(self, "top")
+        self.bottom_grip = PyGrips(self, "bottom")
+        self.top_left_grip = PyGrips(self, "top_left")
+        self.top_right_grip = PyGrips(self, "top_right")
+        self.bottom_left_grip = PyGrips(self, "bottom_left")
+        self.bottom_right_grip = PyGrips(self, "bottom_right")
 
-        return todo
+    def resizeEvent(self, event):
+        self.left_grip.setGeometry(5, 10, 10, self.height())
+        self.right_grip.setGeometry(self.width() - 15, 10, 10, self.height())
+        self.top_grip.setGeometry(5, 5, self.width() - 10, 10)
+        self.bottom_grip.setGeometry(5, self.height() - 15, self.width() - 10, 10)
+        self.top_right_grip.setGeometry(self.width() - 20, 5, 15, 15)
+        self.bottom_left_grip.setGeometry(5, self.height() - 20, 15, 15)
+        self.bottom_right_grip.setGeometry(self.width() - 20, self.height() - 20, 15, 15)
 
     def add_todo(self):
+        self.title_bar.add_todo_button.setEnabled(False)
+        self.title_bar.toggle_edit_button.setEnabled(False)
         count = self.todo_container.layout().count()
 
-        def finish_edit(todoedit):
-            self.create_todo_from_todoedit(count, todoedit)
+        def create_todo_from_todoedit(todoedit):
+            self.title_bar.add_todo_button.setEnabled(True)
+            self.title_bar.toggle_edit_button.setEnabled(True)
 
-        new_todo_edit = PyTodoEdit(finish_edit)
+            todoedit.setParent(None)
+            todo = PyDeletableTodo(
+                todoedit.text(), 
+                on_toggle_cb=self.on_todo_toggle,
+                on_delete_cb=self.delete_todo,
+                on_rename_cb=self.edit_todo
+            )
+            self.todo_container.layout().insertLayout(count, todo)
+            self.update_prog_bar()
+
+        new_todo_edit = PyTodoEdit(create_todo_from_todoedit)
         self.todo_container.layout().addWidget(new_todo_edit)
 
         new_todo_edit.setFocus()
@@ -148,7 +167,7 @@ class MainWindow(QMainWindow):
         self.edit_mode = not self.edit_mode
 
         self.title_bar.add_todo_button.setEnabled(not self.edit_mode)
-
+        
         count = self.todo_container.layout().count()
         for i in range(count):
             todo = self.todo_container.layout().itemAt(i)
@@ -163,13 +182,17 @@ class MainWindow(QMainWindow):
     def delete_todo(self, todo):
         todo.hide()
         todo.setParent(None)
+        self.on_todo_toggle(False)
+        self.update_prog_bar()
 
     def edit_todo(self, todo):
+        self.title_bar.toggle_edit_button.setEnabled(False)
         
         def finish_edit(todoedit):
             todoedit.setParent(None)
             todo.todo.setText(todoedit.text())
             todo.show()
+            self.title_bar.toggle_edit_button.setEnabled(True)
 
         todo.hide()
         todoedit = PyTodoEdit(finish_edit)
@@ -177,3 +200,9 @@ class MainWindow(QMainWindow):
         todo.addWidget(todoedit)
         todoedit.setFocus()
 
+    def update_prog_bar(self):
+        item_count = self.todo_container.layout().count()
+        if item_count == 0:
+            self.bott_bar.progress_bar.setMaximum(1)
+        else:
+            self.bott_bar.progress_bar.setMaximum(item_count)

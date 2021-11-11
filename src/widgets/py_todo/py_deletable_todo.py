@@ -78,6 +78,7 @@ class PyTodoButton(QPushButton):
         }
         """)
 
+        self.setCursor(Qt.PointingHandCursor)
         self.setMaximumSize(30,20)
         self.setIcon(QIcon(icon_path))
         self.setIconSize(QSize(10,10))

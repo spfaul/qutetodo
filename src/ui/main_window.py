@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt, QTimer
 # from PySide6.QtGui import *
 from PySide6.QtWidgets import QMainWindow, QFrame, QHBoxLayout, QVBoxLayout, QScrollArea, QWidget
 
-import time
+from src.core.autosave import AutoSave
 
 from src.widgets.py_button import PyButton
 from src.widgets.py_slider import PySlider
@@ -13,16 +13,22 @@ from src.widgets.py_bottom_bar import PyBottomBar
 from src.widgets.py_grips import PyGrips
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, config):
         super(MainWindow, self).__init__()
 
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setWindowOpacity(.8)
-        self.resize(350,200)
+        self.config = config
+
+        self.do_save = self.config.getboolean('DoAutoSave')
+        if self.do_save:
+            self.saver = AutoSave(self.config.get('SaveFile'))
 
         self.edit_mode = False
         self.todos_done = 0
+
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowOpacity(float(self.config.get('Opacity')))
+        self.resize(int(self.config.get('StartupHeight')), int(self.config.get('StartupWidth')))
 
         self.setup_ui()
 
@@ -51,7 +57,7 @@ class MainWindow(QMainWindow):
         title_bar_container.layout().setContentsMargins(0,0,0,0)
 
         self.title_bar = PyTitleBar(self, self)
-        self.title_bar.set_title('QuteTodo - Minimalist Todo List')
+        self.title_bar.set_title(self.config.get('Title'))
         
         self.title_bar.add_todo_button.clicked.connect(self.add_todo)
         self.title_bar.toggle_edit_button.clicked.connect(self.toggle_edit_mode)
@@ -102,10 +108,30 @@ class MainWindow(QMainWindow):
         self.todo_container.setLayout(QVBoxLayout())
         self.todo_scroll_container.setWidget(self.todo_container)
 
+        # Load Todos
+        if self.do_save:
+             todo_infos = self.saver.load()
+
+             for todo in todo_infos:
+                self.todo_container.layout().addLayout(
+                    PyDeletableTodo(
+                        todo['description'],
+                        default_val=todo['complete'],
+                        on_toggle_cb=self.on_todo_toggle,
+                        on_delete_cb=self.delete_todo,
+                        on_rename_cb=self.edit_todo
+                        )
+                )
+
+                if todo['complete']:
+                    self.todos_done += 1
+
         # Bottom Bar
         self.bott_bar = PyBottomBar()
         self.bott_bar.setFocusPolicy(Qt.NoFocus)
         self.main_container.layout().addWidget(self.bott_bar)
+
+        self.update_prog_bar()
 
         self.left_grip = PyGrips(self, "left")
         self.right_grip = PyGrips(self, "right")
@@ -125,6 +151,14 @@ class MainWindow(QMainWindow):
         self.bottom_left_grip.setGeometry(5, self.height() - 20, 15, 15)
         self.bottom_right_grip.setGeometry(self.width() - 20, self.height() - 20, 15, 15)
 
+    def update_save_file(self):
+        count = self.todo_container.layout().count()
+        todos = []
+        for i in range(count):
+            todos.append(self.todo_container.layout().itemAt(i).todo)
+        self.saver.save(todos)
+
+
     def add_todo(self):
         self.title_bar.add_todo_button.setEnabled(False)
         self.title_bar.toggle_edit_button.setEnabled(False)
@@ -143,6 +177,8 @@ class MainWindow(QMainWindow):
             )
             self.todo_container.layout().insertLayout(count, todo)
             self.update_prog_bar()
+            if self.do_save:
+                self.update_save_file()
 
         new_todo_edit = PyTodoEdit(create_todo_from_todoedit)
         self.todo_container.layout().addWidget(new_todo_edit)
@@ -156,6 +192,9 @@ class MainWindow(QMainWindow):
         else:
             self.todos_done -= 1
         self.bott_bar.progress_bar.setValue(self.todos_done)
+
+        if self.do_save:
+            self.update_save_file()
 
     def scroll_to_bottom(self):
         self.todo_scroll_container.ensureVisible(0, self.todo_container.height())
@@ -185,6 +224,9 @@ class MainWindow(QMainWindow):
         self.on_todo_toggle(False)
         self.update_prog_bar()
 
+        if self.do_save:
+            self.update_save_file()
+
     def edit_todo(self, todo):
         self.title_bar.toggle_edit_button.setEnabled(False)
         
@@ -193,6 +235,9 @@ class MainWindow(QMainWindow):
             todo.todo.setText(todoedit.text())
             todo.show()
             self.title_bar.toggle_edit_button.setEnabled(True)
+            
+            if self.do_save:
+                self.update_save_file()
 
         todo.hide()
         todoedit = PyTodoEdit(finish_edit)
@@ -201,8 +246,11 @@ class MainWindow(QMainWindow):
         todoedit.setFocus()
 
     def update_prog_bar(self):
+        self.bott_bar.progress_bar.setValue(self.todos_done)
+        
         item_count = self.todo_container.layout().count()
         if item_count == 0:
             self.bott_bar.progress_bar.setMaximum(1)
         else:
             self.bott_bar.progress_bar.setMaximum(item_count)
+

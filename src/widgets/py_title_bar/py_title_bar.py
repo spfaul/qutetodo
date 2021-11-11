@@ -250,7 +250,7 @@ class PyTitleBar(QWidget):
 
         # TITLE LABEL
         self.title_label = QLabel()
-        self.title_label.setAlignment(Qt.AlignVCenter)
+        self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setStyleSheet(f"""
             font: {self._title_size}pt \"{self._font_family}\";
             color: white;

@@ -5,10 +5,11 @@ from PySide6.QtWidgets import *
 class PyTodo(QRadioButton):
     _color = QColor('white')
 
-    def __init__(self, task, on_toggle_cb=None):
+    def __init__(self, task, on_toggle_cb=None, default_val=False):
         super().__init__(task)
 
         self.on_toggle_cb = on_toggle_cb
+        self.setChecked(default_val)
 
         self.anim = QPropertyAnimation(self, b"color")
 

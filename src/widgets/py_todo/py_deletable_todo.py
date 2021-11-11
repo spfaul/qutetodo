@@ -8,6 +8,7 @@ class PyDeletableTodo(QHBoxLayout):
     def __init__(
         self,
         task,
+        default_val=False,
         on_toggle_cb=None,
         on_delete_cb=None,
         on_rename_cb=None
@@ -16,8 +17,8 @@ class PyDeletableTodo(QHBoxLayout):
         self.on_delete_cb = on_delete_cb
         self.on_rename_cb = on_rename_cb
 
-        self.todo = PyTodo(task, on_toggle_cb)
-        
+        self.todo = PyTodo(task, on_toggle_cb, default_val)
+
         self.delete_button = PyTodoButton("src/assets/images/icon_close.svg")
         self.delete_button.clicked.connect(self.on_delete)
 

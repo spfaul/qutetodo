@@ -1,23 +1,27 @@
 import os
 import codecs
 from src.widgets.py_todo import PyTodo
-from typing import List, NoReturn
+from typing import List, NoReturn, TypedDict
+
+TodoInfo = TypedDict('TodoInfo', {'complete': bool, 'description': str})
 
 class AutoSave:
     def __init__(self, file_path: str):
         self.file_path = file_path
 
-    def load(self) -> List[dict]:
-        todos = []
+    def load(self) -> List[TodoInfo]:
+        todos: List[TodoInfo] = []
 
         if os.path.exists(self.file_path):
             with codecs.open(self.file_path, 'r', 'utf-8') as save_file:
-                content = save_file.read()
+                content: str = save_file.read()
 
             if content == "":
                 return []
 
             for line in content.split('\n'):
+                status: str
+                todo_descrip: str
                 status, todo_descrip = line.split(' ', 1)
 
                 if status == 'o':
@@ -30,6 +34,8 @@ class AutoSave:
     def save(self, todos: List[PyTodo]) -> NoReturn:
         save_content: str = "" 
         
+        idx: int
+        todo: PyTodo
         for idx, todo in enumerate(todos):
             if todo.isChecked():
                 save_content += f'\u2713 {todo.text()}'

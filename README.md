@@ -11,6 +11,7 @@ A minimalist To-Do list built using the Qt Framework.
 
 ## Installation
 ### Building From Source
+Recommended Version: Python 3.8+
 1. Download The Repo Locally
 ```bash
 git clone https://github.com/t0a5ted/qutetodo.git

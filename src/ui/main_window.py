@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QTimer, QEvent
-from PySide6.QtGui import QMouseEvent
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QMouseEvent, QResizeEvent
 from PySide6.QtWidgets import QMainWindow, QFrame, QHBoxLayout, QVBoxLayout, QScrollArea, QWidget
 from configparser import SectionProxy
 from typing import NoReturn, List
@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
         self.bottom_left_grip: PyGrips = PyGrips(self, "bottom_left")
         self.bottom_right_grip: PyGrips = PyGrips(self, "bottom_right")
 
-    def resizeEvent(self, event: QResizeEvent) -> NoReturn:
+    def resizeEvent(self, event) -> NoReturn:
         self.left_grip.setGeometry(5, 10, 10, self.height())
         self.right_grip.setGeometry(self.width() - 15, 10, 10, self.height())
         self.top_grip.setGeometry(5, 5, self.width() - 10, 10)
